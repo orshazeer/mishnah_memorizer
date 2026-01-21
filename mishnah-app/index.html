@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Mishnah Fluency Pro</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --primary: #38bdf8;
+            --accent: #fbbf24;
+            --error: #f43f5e;
+            --success: #10b981;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --modal-bg: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'SBL Hebrew', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #top-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .btn {
+            background: var(--surface);
+            border: 1px solid var(--surface-hover);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-1px); }
+
+        #status-container { text-align: center; margin-bottom: 40px; margin-top: -60px; }
+        #status { color: var(--primary); font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; cursor: pointer; }
+        #instructions { color: var(--text); font-size: 42px; font-weight: 700; margin-bottom: 8px; }
+        #sub-instructions { color: var(--accent); font-size: 18px; font-weight: 500; height: 24px; }
+
+        #display-area {
+            width: 85%;
+            min-height: 250px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        /* Adjusted Font Weights for better readability */
+        .chunk-mode { font-size: 72px; font-weight: 700; line-height: 1.3; }
+        .full-mode { font-size: 44px; font-weight: 500; gap: 12px; line-height: 1.5; }
+        
+        .word { padding: 2px 6px; border-radius: 8px; transition: 0.1s; }
+        .wrong-word { background: rgba(244, 63, 94, 0.2); color: var(--error); text-decoration: line-through; }
+        
+        /* Gold Italic Hint */
+        .hint-letter { color: var(--accent); font-style: italic; font-weight: 700; margin: 0 8px; opacity: 0.9; }
+
+        #progress-pips {
+            position: absolute;
+            bottom: 60px;
+            display: flex;
+            gap: 10px;
+        }
+        .pip { width: 35px; height: 6px; background: var(--surface-hover); border-radius: 20px; transition: 0.4s; }
+        .pip.active { background: var(--primary); width: 60px; box-shadow: 0 0 15px var(--primary); }
+        .pip.complete { background: var(--success); }
+
+        #nav-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--modal-bg);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-card { background: var(--surface); width: 600px; max-width: 90%; height: 550px; border-radius: 24px; border: 1px solid var(--surface-hover); display: flex; flex-direction: column; overflow: hidden; }
+        .nav-header { padding: 20px; border-bottom: 1px solid var(--surface-hover); display: flex; justify-content: space-between; }
+        .nav-body { flex: 1; padding: 20px; overflow-y: auto; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 12px; }
+        .grid-item { background: var(--bg); border: 1px solid var(--surface-hover); border-radius: 8px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .grid-item:hover { border-color: var(--primary); color: var(--primary); }
+        .list-item { padding: 12px 16px; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .list-item:hover { background: var(--surface-hover); color: var(--primary); }
+        #masechet-search { background: transparent; border: none; border-bottom: 2px solid var(--surface-hover); color: var(--text); font-size: 24px; padding: 10px 0; width: 100%; margin-bottom: 20px; outline: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="top-bar">
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" onclick="openNav()">📚 Navigator</button>
+            <label style="font-size: 13px; color: var(--text-dim); cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="hide-refs" checked onchange="reloadText()"> Hide Refs
+            </label>
+        </div>
+        <button class="btn" onclick="toggleLanguage()">🌐 EN/HE</button>
+    </div>
+
+    <div id="status-container">
+        <div id="status" onclick="openNav()">Select Mishnah</div>
+        <div id="instructions">Mishnah Fluency</div>
+        <div id="sub-instructions">Press 'N' for Navigator</div>
+    </div>
+
+    <div id="display-area"></div>
+    <div id="progress-pips"></div>
+
+    <div id="nav-modal" onclick="if(event.target===this) closeNav()">
+        <div class="nav-card">
+            <div class="nav-header"><span id="nav-step-title">Select Masechet</span><button class="btn" onclick="closeNav()">✕</button></div>
+            <div class="nav-body">
+                <div id="step-masechet"><input type="text" id="masechet-search" placeholder="Search..."><div id="masechet-list"></div></div>
+                <div id="step-perek" class="hidden"><button class="btn" onclick="backToMasechet()">← Back</button><div id="perek-grid" class="grid-container"></div></div>
+                <div id="step-mishnah" class="hidden"><button class="btn" onclick="backToPerek()">← Back</button><div id="mishnah-grid" class="grid-container"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const masechtotData = [
+        { en: "Berakhot", he: "ברכות", file: "Berakhot" }, { en: "Peah", he: "פאה", file: "Peah" }, { en: "Demai", he: "דמאי", file: "Demai" }, { en: "Kilayim", he: "כלאיים", file: "Kilayim" }, { en: "Sheviit", he: "שביעית", file: "Sheviit" }, { en: "Terumot", he: "תרומות", file: "Terumot" }, { en: "Maaserot", he: "מעשרות", file: "Maaserot" }, { en: "Maaser Sheni", he: "מעשר שני", file: "Maaser_Sheni" }, { en: "Challah", he: "חלה", file: "Challah" }, { en: "Orlah", he: "ערלה", file: "Orlah" }, { en: "Bikkurim", he: "ביכורים", file: "Bikkurim" }, { en: "Shabbat", he: "שבת", file: "Shabbat" }, { en: "Eruvin", he: "עירובין", file: "Eruvin" }, { en: "Pesachim", he: "פסחים", file: "Pesachim" }, { en: "Sheqalim", he: "שקלים", file: "Sheqalim" }, { en: "Yoma", he: "יומא", file: "Yoma" }, { en: "Sukkah", he: "סוכה", file: "Sukkah" }, { en: "Beitzah", he: "ביצה", file: "Beitzah" }, { en: "Rosh Hashanah", he: "ראש השנה", file: "Rosh_Hashanah" }, { en: "Taanit", he: "תענית", file: "Taanit" }, { en: "Megillah", he: "מגילה", file: "Megillah" }, { en: "Moed Katan", he: "מועד קטן", file: "Moed_Katan" }, { en: "Chagigah", he: "חגיגה", file: "Chagigah" }, { en: "Yevamot", he: "יבמות", file: "Yevamot" }, { en: "Ketubot", he: "כתובות", file: "Ketubot" }, { en: "Nedarim", he: "נדרים", file: "Nedarim" }, { en: "Nazir", he: "נזיר", file: "Nazir" }, { en: "Sotah", he: "סוטה", file: "Sotah" }, { en: "Gittin", he: "גיטין", file: "Gittin" }, { en: "Kiddushin", he: "קידושין", file: "Kiddushin" }, { en: "Bava Kamma", he: "בבא קמא", file: "Bava_Kamma" }, { en: "Bava Metzia", he: "בבא מציעא", file: "Bava_Metzia" }, { en: "Bava Batra", he: "בבא בתרא", file: "Bava_Batra" }, { en: "Sanhedrin", he: "סנהדרין", file: "Sanhedrin" }, { en: "Makkot", he: "מכות", file: "Makkot" }, { en: "Shevuot", he: "שבועות", file: "Shevuot" }, { en: "Eduyot", he: "עדיות", file: "Eduyot" }, { en: "Avodah Zarah", he: "עבודה זרה", file: "Avodah_Zarah" }, { en: "Avot", he: "אבות", file: "Avot" }, { en: "Horayot", he: "הוריות", file: "Horayot" }, { en: "Zevachim", he: "זבחים", file: "Zevachim" }, { en: "Menachot", he: "מנחות", file: "Menachot" }, { en: "Chullin", he: "חולין", file: "Chullin" }, { en: "Bekhorot", he: "בכורות", file: "Bekhorot" }, { en: "Arakhin", he: "ערכין", file: "Arakhin" }, { en: "Temurah", he: "תמורה", file: "Temurah" }, { en: "Keritot", he: "כריתות", file: "Keritot" }, { en: "Meilah", he: "מעילה", file: "Meilah" }, { en: "Tamid", he: "תמיד", file: "Tamid" }, { en: "Middot", he: "מידות", file: "Middot" }, { en: "Kinnim", he: "קינים", file: "Kinnim" }, { en: "Keilim", he: "כלים", file: "Keilim" }, { en: "Oholot", he: "אהלות", file: "Oholot" }, { en: "Negaim", he: "נגעים", file: "Negaim" }, { en: "Parah", he: "פרה", file: "Parah" }, { en: "Tohorot", he: "טהרות", file: "Tohorot" }, { en: "Mikvaot", he: "מקואות", file: "Mikvaot" }, { en: "Niddah", he: "נדה", file: "Niddah" }, { en: "Machshirin", he: "מכשירין", file: "Machshirin" }, { en: "Zavim", he: "זבים", file: "Zavim" }, { en: "Tevul Yom", he: "טבול יום", file: "Tevul_Yom" }, { en: "Yadayim", he: "ידים", file: "Yadayim" }, { en: "Uktzin", he: "עוקצין", file: "Uktzin" }
+    ];
+
+    let tractate = [], rawTextCache = "", currentTractateName = "", currentTractateHebrew = "";
+    let pIdx = 0, mIdx = 0, sIdx = 0, cIdx = 0, wIdx = -1;
+    let displayState = "CHUNKS", currentLang = 'en', showHint = false;
+    let correctionTarget = -1, correctionSentenceIdx = -1, returnState = "";
+
+    const content = {
+        en: { perek: "Perek", mishnah: "Mishnah", steps: { CHUNKS: "Learn Chunks", FULL_SENTENCE: "Read Full", SENTENCE_REVIEW: "Recite", CUMULATIVE_REVIEW: "Mastery", CORRECTING: "Correction" }, subs: { CHUNKS: "Read aloud, press Space", FULL_SENTENCE: "Read full sentence", SENTENCE_REVIEW: "Say next word", CUMULATIVE_REVIEW: "Recite from start", CORRECTING: "Repeat word" } },
+        he: { perek: "פרק", mishnah: "משנה", steps: { CHUNKS: "לימוד מקטעים", FULL_SENTENCE: "קריאה מלאה", SENTENCE_REVIEW: "שינון", CUMULATIVE_REVIEW: "חזרה", CORRECTING: "תיקון" }, subs: { CHUNKS: "קרא ולחץ רווח", FULL_SENTENCE: "קרא משפט מלא", SENTENCE_REVIEW: "אמור מילה הבאה", CUMULATIVE_REVIEW: "חזור מההתחלה", CORRECTING: "חזור על המילה" } }
+    };
+
+    function parseTractate(text) {
+        const hideRefs = document.getElementById('hide-refs').checked;
+        const refRegex = /\([\u0590-\u05FF\s0-9"']+\)/g;
+        const perekBlocks = text.split(/\n\s*\n/);
+        tractate = perekBlocks.map(block => {
+            const lines = block.split('\n').map(l => l.trim()).filter(l => l && !(l.includes("משנה") && l.length < 20));
+            return lines.map(mText => {
+                let cleanText = hideRefs ? mText.replace(refRegex, "") : mText;
+                const sentences = cleanText.split(/([.:?])/).reduce((acc, val, i, arr) => {
+                    if (i % 2 === 0 && val.trim()) {
+                        const cleanStr = val.trim();
+                        const words = cleanStr.split(/\s+/).filter(w => w.length > 0);
+                        const chunks = cleanStr.split(/([,;])+/).reduce((cAcc, cVal, cI, cArr) => {
+                            if (cI % 2 === 0 && cVal.trim()) cAcc.push(cVal.trim() + (cArr[cI+1] || ""));
+                            return cAcc;
+                        }, []);
+                        acc.push({ words, chunks, hasInternalBreaks: chunks.length > 1 });
+                    }
+                    return acc;
+                }, []);
+                return { sentences };
+            });
+        }).filter(p => p.length > 0);
+    }
+
+    function reloadText() { if(rawTextCache) { parseTractate(rawTextCache); resetToPosition(pIdx, mIdx); } }
+
+    function updateDisplay(highlightError = false) {
+        if (!tractate.length) return;
+        const curM = tractate[pIdx][mIdx];
+        const curS = curM.sentences[sIdx];
+        const area = document.getElementById('display-area');
+        area.innerHTML = "";
+
+        document.getElementById('instructions').innerText = content[currentLang].steps[displayState];
+        document.getElementById('sub-instructions').innerText = content[currentLang].subs[displayState];
+        document.getElementById('status').innerText = `${currentLang === 'en' ? currentTractateName : currentTractateHebrew} ${pIdx+1}:${mIdx+1}`;
+        updatePips(curM.sentences.length);
+
+        if (displayState === "CHUNKS") {
+            area.className = "chunk-mode"; area.innerText = curS.chunks[cIdx];
+        } else if (displayState === "FULL_SENTENCE") {
+            area.className = "chunk-mode"; area.innerText = curS.words.join(' ');
+        } else if (displayState === "SENTENCE_REVIEW" || displayState === "CUMULATIVE_REVIEW") {
+            area.className = "full-mode";
+            const words = (displayState === "SENTENCE_REVIEW") ? 
+                curS.words.slice(0, wIdx + 1) : 
+                [].concat(...curM.sentences.slice(0, sIdx + 1).map(s => s.words)).slice(0, wIdx + 1);
+            
+            words.forEach((w, i) => {
+                const span = document.createElement('span');
+                span.className = "word" + (highlightError && i === words.length-1 ? " wrong-word" : "");
+                span.innerText = w; area.appendChild(span);
+            });
+
+            if (showHint) {
+                let nextW = "";
+                if (displayState === "SENTENCE_REVIEW") nextW = curS.words[wIdx+1];
+                else {
+                    const all = [].concat(...curM.sentences.slice(0, sIdx + 1).map(s => s.words));
+                    nextW = all[wIdx+1];
+                }
+                if (nextW) {
+                    const h = document.createElement('span'); h.className = "hint-letter";
+                    h.innerText = nextW.charAt(0); area.appendChild(h);
+                }
+            }
+        } else if (displayState === "CORRECTING") {
+            area.className = "full-mode";
+            const targetWords = tractate[pIdx][mIdx].sentences[correctionSentenceIdx].words;
+            targetWords.slice(0, wIdx + 1).forEach((w, i) => {
+                const span = document.createElement('span'); span.innerText = w;
+                span.className = 'word';
+                if (i === correctionTarget) span.style.color = 'var(--success)';
+                area.appendChild(span);
+            });
+        }
+    }
+
+    function updatePips(total) {
+        const container = document.getElementById('progress-pips'); container.innerHTML = "";
+        for(let i=0; i<total; i++) {
+            const p = document.createElement('div');
+            p.className = "pip " + (i < sIdx ? "complete" : (i === sIdx ? "active" : ""));
+            container.appendChild(p);
+        }
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (document.getElementById('nav-modal').style.display === "flex") return;
+        const k = e.key.toLowerCase();
+        if (k === 'n') { openNav(); return; }
+        if (k === 'h') { showHint = !showHint; updateDisplay(); return; }
+        if (!tractate.length) return;
+
+        const curM = tractate[pIdx][mIdx];
+        const curS = curM.sentences[sIdx];
+
+        if (e.code === 'Space') {
+            e.preventDefault(); showHint = false;
+            if (displayState === "CHUNKS") {
+                if (cIdx < curS.chunks.length - 1) cIdx++;
+                else { displayState = "SENTENCE_REVIEW"; wIdx = -1; }
+            } else if (displayState === "FULL_SENTENCE") {
+                if (sIdx === 0 && curM.sentences.length > 1) { displayState = "SENTENCE_REVIEW"; wIdx = -1; }
+                else advance();
+            } else if (displayState === "SENTENCE_REVIEW") {
+                if (wIdx < curS.words.length - 1) wIdx++;
+                else sIdx === 0 ? advance() : (displayState = "CUMULATIVE_REVIEW", wIdx = -1);
+            } else if (displayState === "CUMULATIVE_REVIEW") {
+                const total = curM.sentences.slice(0, sIdx + 1).reduce((a,b)=>a+b.words.length, 0);
+                if (wIdx < total - 1) wIdx++; else advance();
+            } else if (displayState === "CORRECTING") {
+                if (wIdx < correctionTarget) wIdx++; 
+                else { displayState = returnState; wIdx = -1; }
+            }
+            updateDisplay();
+        }
+
+        if (e.code === 'Backspace') {
+            // FIX: Prevent loop by checking if already correcting
+            if (wIdx < 0 || displayState === "CORRECTING") return;
+            returnState = displayState;
+            
+            // Map global word index to the specific sentence for the correction screen
+            if (displayState === "CUMULATIVE_REVIEW") {
+                let count = 0;
+                for (let i = 0; i <= sIdx; i++) {
+                    let len = curM.sentences[i].words.length;
+                    if (wIdx < count + len) {
+                        correctionSentenceIdx = i;
+                        correctionTarget = wIdx - count;
+                        break;
+                    }
+                    count += len;
+                }
+            } else {
+                correctionSentenceIdx = sIdx;
+                correctionTarget = wIdx;
+            }
+
+            updateDisplay(true);
+            setTimeout(() => { displayState = "CORRECTING"; wIdx = -1; updateDisplay(); }, 400);
+        }
+    });
+
+    function advance() {
+        const curM = tractate[pIdx][mIdx];
+        if (sIdx < curM.sentences.length - 1) {
+            sIdx++; cIdx = 0; wIdx = -1;
+            displayState = curM.sentences[sIdx].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
+        } else {
+            if (mIdx < tractate[pIdx].length - 1) resetToPosition(pIdx, mIdx+1);
+            else if (pIdx < tractate.length -1) resetToPosition(pIdx + 1, 0);
+        }
+    }
+
+    function resetToPosition(p, m) { pIdx = p; mIdx = m; sIdx = 0; cIdx = 0; wIdx = -1; showHint = false; reloadText; updateDisplay(); }
+    function openNav() { document.getElementById('nav-modal').style.display = "flex"; resetNavToMasechet(); }
+    function closeNav() { document.getElementById('nav-modal').style.display = "none"; }
+    function resetNavToMasechet() { document.getElementById('step-masechet').classList.remove('hidden'); document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.add('hidden'); renderMasechetList(""); }
+    function backToMasechet() { resetNavToMasechet(); }
+    function backToPerek() { document.getElementById('step-mishnah').classList.add('hidden'); document.getElementById('step-perek').classList.remove('hidden'); }
+    function renderMasechetList(f) { const c = document.getElementById('masechet-list'); c.innerHTML = ""; masechtotData.forEach(m => { if(m.en.toLowerCase().includes(f) || m.he.includes(f)) { const d = document.createElement('div'); d.className='list-item'; d.innerHTML=`<span>${m.he}</span><span>${m.en}</span>`; d.onclick=()=>selectMasechet(m); c.appendChild(d); } }); }
+    async function selectMasechet(m) { const r = await fetch(`./Clean_Mishnah/${m.file}.txt`); rawTextCache = await r.text(); parseTractate(rawTextCache); currentTractateName = m.en; currentTractateHebrew = m.he; document.getElementById('step-masechet').classList.add('hidden'); document.getElementById('step-perek').classList.remove('hidden'); const g = document.getElementById('perek-grid'); g.innerHTML = ""; tractate.forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>selectPerek(i); g.appendChild(b); }); }
+    function selectPerek(p) { pIdx = p; document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.remove('hidden'); const g = document.getElementById('mishnah-grid'); g.innerHTML = ""; tractate[pIdx].forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>{ resetToPosition(pIdx, i); closeNav(); }; g.appendChild(b); }); }
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'he' : 'en'; updateDisplay(); }
+    document.getElementById('masechet-search').addEventListener('input', (e) => renderMasechetList(e.target.value.toLowerCase()));
+    openNav();
+    </script>
+</body>
+</html>
