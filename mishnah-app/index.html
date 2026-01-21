@@ -109,7 +109,7 @@
 
     <script>
     const masechtotData = [
-        { en: "Berakhot", he: "ברכות", file: "Berakhot" }, { en: "Peah", he: "פאה", file: "Peah" }, { en: "Demai", he: "דמאי", file: "Demai" }, { en: "Kilayim", he: "כלאיים", file: "Kilayim" }, { en: "Sheviit", he: "שביעית", file: "Sheviit" }, { en: "Terumot", he: "תרומות", file: "Terumot" }, { en: "Maaserot", he: "מעשרות", file: "Maaserot" }, { en: "Maaser Sheni", he: "מעשר_Sheni", file: "Maaser_Sheni" }, { en: "Challah", he: "חלה", file: "Challah" }, { en: "Orlah", he: "ערלה", file: "Orlah" }, { en: "Bikkurim", he: "ביכורים", file: "Bikkurim" }, { en: "Shabbat", he: "שבת", file: "Shabbat" }, { en: "Eruvin", he: "עירובין", file: "Eruvin" }, { en: "Pesachim", he: "פסחים", file: "Pesachim" }, { en: "Sheqalim", he: "שקלים", file: "Sheqalim" }, { en: "Yoma", he: "יומא", file: "Yoma" }, { en: "Sukkah", he: "סוכה", file: "Sukkah" }, { en: "Beitzah", he: "ביצה", file: "Beitzah" }, { en: "Rosh Hashanah", he: "ראש_השנה", file: "Rosh_Hashanah" }, { en: "Taanit", he: "תענית", file: "Taanit" }, { en: "Megillah", he: "מגילה", file: "Megillah" }, { en: "Moed Katan", he: "מועד_קטן", file: "Moed_Katan" }, { en: "Chagigah", he: "חגיגה", file: "Chagigah" }
+        { en: "Berakhot", he: "ברכות", file: "Berakhot" }, { en: "Peah", he: "פאה", file: "Peah" }, { en: "Demai", he: "דמאי", file: "Demai" }, { en: "Kilayim", he: "כלאיים", file: "Kilayim" }, { en: "Sheviit", he: "שביעית", file: "Sheviit" }, { en: "Terumot", he: "תרומות", file: "Terumot" }, { en: "Maaserot", he: "מעשרות", file: "Maaserot" }, { en: "Maaser Sheni", he: "מעשר שני", file: "Maaser_Sheni" }, { en: "Challah", he: "חלה", file: "Challah" }, { en: "Orlah", he: "ערלה", file: "Orlah" }, { en: "Bikkurim", he: "ביכורים", file: "Bikkurim" }, { en: "Shabbat", he: "שבת", file: "Shabbat" }, { en: "Eruvin", he: "עירובין", file: "Eruvin" }, { en: "Pesachim", he: "פסחים", file: "Pesachim" }, { en: "Sheqalim", he: "שקלים", file: "Sheqalim" }, { en: "Yoma", he: "יומא", file: "Yoma" }, { en: "Sukkah", he: "סוכה", file: "Sukkah" }, { en: "Beitzah", he: "ביצה", file: "Beitzah" }, { en: "Rosh Hashanah", he: "ראש השנה", file: "Rosh_Hashanah" }, { en: "Taanit", he: "תענית", file: "Taanit" }, { en: "Megillah", he: "מגילה", file: "Megillah" }, { en: "Moed Katan", he: "מועד קטן", file: "Moed_Katan" }, { en: "Chagigah", he: "חגיגה", file: "Chagigah" }
     ];
 
     let tractate = [], bartenuraData = [], rawTextCache = "", currentTractateName = "", currentTractateHebrew = "";
@@ -120,6 +120,8 @@
         he: { steps: { CHUNKS: "לימוד מקטעים", FULL_SENTENCE: "קריאה מלאה", SENTENCE_REVIEW: "שינון", CUMULATIVE_REVIEW: "חזרה" } }
     };
 
+    // --- PARSING LOGIC ---
+
     function parseTractate(text) {
         const perekBlocks = text.trim().split(/\r?\n\s*\r?\n/);
         tractate = perekBlocks.map(block => {
@@ -128,10 +130,14 @@
                 const sentences = mText.split(/([.:?])+/).reduce((acc, val, i, arr) => {
                     if (i % 2 === 0 && val.trim()) {
                         const cleanStr = val.trim();
-                        acc.push({ words: cleanStr.split(/\s+/), chunks: cleanStr.split(/([,;])+/).reduce((cAcc, cVal, cI, cArr) => {
-                            if (cI % 2 === 0 && cVal.trim()) cAcc.push(cVal.trim() + (cArr[cI+1] || ""));
-                            return cAcc;
-                        }, []), hasInternalBreaks: cleanStr.includes(',') || cleanStr.includes(';') });
+                        acc.push({ 
+                            words: cleanStr.split(/\s+/), 
+                            chunks: cleanStr.split(/([,;])+/).reduce((cAcc, cVal, cI, cArr) => {
+                                if (cI % 2 === 0 && cVal.trim()) cAcc.push(cVal.trim() + (cArr[cI+1] || ""));
+                                return cAcc;
+                            }, []), 
+                            hasInternalBreaks: cleanStr.includes(',') || cleanStr.includes(';') 
+                        });
                     }
                     return acc;
                 }, []);
@@ -140,51 +146,56 @@
         }).filter(p => p.length > 0);
     }
 
-    // IMPROVED BARTENURA PARSING: Handles Windows and Mac line endings
     function parseBartenura(text) {
+        // Splits by double newline (Chapters) then single newline (Mishnayot)
         return text.trim().split(/\r?\n\s*\r?\n/).map(perek => 
             perek.split(/\r?\n/).map(m => m.trim()).filter(m => m.length > 0)
         );
     }
 
+    // --- DATA LOADING ---
+
     async function selectMasechet(m) {
         const bartArea = document.getElementById('bartenura-area');
-        
+        bartArea.innerHTML = "Loading...";
+
         // 1. Load Mishnah
         try {
             const r = await fetch(`./Clean_Mishnah/${m.file}.txt`);
+            if (!r.ok) throw new Error();
             rawTextCache = await r.text();
             parseTractate(rawTextCache);
-        } catch(e) { console.error("Mishnah load failed"); }
+        } catch(e) { 
+            console.error("Mishnah file missing:", m.file);
+        }
 
-        // 2. Load Bartenura - Trying exactly what we see in the screenshot
+        // 2. Load Bartenura
         const targetFile = `Bartenura_${m.file}.txt`;
-        const bartenuraPath = `./Bartenura/${targetFile}`;
-        
         try {
-            const rb = await fetch(bartenuraPath);
+            const rb = await fetch(`./Bartenura/${targetFile}`);
             if (rb.ok) {
                 const bText = await rb.text();
                 bartenuraData = parseBartenura(bText);
-                console.log(`Loaded Bartenura: ${targetFile}`);
             } else {
                 bartenuraData = [];
-                bartArea.innerHTML = `<span style="color:var(--error)">Error: Could not find "${targetFile}" in the Bartenura folder.</span>`;
+                bartArea.innerHTML = `<span style="color:var(--error)">File Not Found: Bartenura/${targetFile}</span>`;
             }
         } catch (e) {
             bartenuraData = [];
-            bartArea.innerHTML = `<span style="color:var(--error)">System Error: Path blocked or file missing.</span>`;
         }
 
         currentTractateName = m.en; 
         currentTractateHebrew = m.he;
         document.getElementById('step-masechet').classList.add('hidden');
         document.getElementById('step-perek').classList.remove('hidden');
-        const g = document.getElementById('perek-grid'); g.innerHTML = "";
+        const g = document.getElementById('perek-grid'); 
+        g.innerHTML = "";
         tractate.forEach((_, i) => { 
             const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>selectPerek(i); g.appendChild(b); 
         });
     }
+
+    // --- DISPLAY LOGIC ---
 
     function updateDisplay() {
         if (!tractate.length) return;
@@ -193,19 +204,16 @@
         const area = document.getElementById('display-area');
         const bartArea = document.getElementById('bartenura-area');
 
-        // DISPLAY BARTENURA
-        const showBart = document.getElementById('show-bart').checked;
-        if (showBart) {
-            // Check if we have data for this Perek and Mishnah
+        // Show/Hide Bartenura
+        if (document.getElementById('show-bart').checked) {
             if (bartenuraData[pIdx] && bartenuraData[pIdx][mIdx]) {
                 bartArea.innerHTML = `<span class="bart-label">פירוש רע"ב:</span>${bartenuraData[pIdx][mIdx]}`;
-                bartArea.classList.remove('hidden');
+                bartArea.style.display = "block";
             } else {
-                // If the arrays exist but are empty at this index
-                bartArea.innerHTML = `<span class="bart-label">פירוש רע"ב:</span> <i style="color:var(--text-dim)">No commentary found for this Mishnah in the file.</i>`;
+                bartArea.innerHTML = `<span class="bart-label">פירוש רע"ב:</span> <small>No text found for P${pIdx+1}:M${mIdx+1}</small>`;
             }
         } else {
-            bartArea.classList.add('hidden');
+            bartArea.style.display = "none";
         }
 
         document.getElementById('instructions').innerText = content[currentLang].steps[displayState];
@@ -224,6 +232,115 @@
             words.forEach(w => { const s = document.createElement('span'); s.className="word"; s.innerText=w; area.appendChild(s); });
         }
     }
+
+    // --- NAVIGATION & UTILS ---
+
+    function updatePips(t) { 
+        const c = document.getElementById('progress-pips'); 
+        c.innerHTML=""; 
+        for(let i=0;i<t;i++){ 
+            const p=document.createElement('div'); 
+            p.className=`pip ${i<sIdx?'complete':(i===sIdx?'active':'')}`; 
+            c.appendChild(p); 
+        } 
+    }
+
+    function openNav() { 
+        document.getElementById('nav-modal').style.display="flex"; 
+        renderMasechetList(""); 
+    }
+
+    function closeNav() { 
+        document.getElementById('nav-modal').style.display="none"; 
+    }
+
+    function backToMasechet() { 
+        document.getElementById('step-perek').classList.add('hidden'); 
+        document.getElementById('step-masechet').classList.remove('hidden'); 
+    }
+
+    function backToPerek() { 
+        document.getElementById('step-mishnah').classList.add('hidden'); 
+        document.getElementById('step-perek').classList.remove('hidden'); 
+    }
+
+    function selectPerek(p) { 
+        pIdx=p; 
+        document.getElementById('step-perek').classList.add('hidden'); 
+        document.getElementById('step-mishnah').classList.remove('hidden'); 
+        const g=document.getElementById('mishnah-grid'); 
+        g.innerHTML=""; 
+        tractate[pIdx].forEach((_,i)=>{ 
+            const b=document.createElement('div'); 
+            b.className='grid-item'; 
+            b.innerText=i+1; 
+            b.onclick=()=>{ resetToPosition(pIdx,i); closeNav(); }; 
+            g.appendChild(b); 
+        }); 
+    }
+
+    function renderMasechetList(f) { 
+        const c=document.getElementById('masechet-list'); 
+        c.innerHTML=""; 
+        masechtotData.forEach(m=>{ 
+            if(m.en.toLowerCase().includes(f) || m.he.includes(f)){ 
+                const d=document.createElement('div'); 
+                d.className='list-item'; 
+                d.innerHTML=`<span>${m.he}</span><span>${m.en}</span>`; 
+                d.onclick=()=>selectMasechet(m); 
+                c.appendChild(d); 
+            }
+        }); 
+    }
+
+    function resetToPosition(p, m) { 
+        pIdx=p; mIdx=m; sIdx=0; cIdx=0; wIdx=-1; 
+        displayState = tractate[pIdx][mIdx].sentences[0].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
+        updateDisplay(); 
+    }
+
+    function advance() { 
+        if (sIdx < tractate[pIdx][mIdx].sentences.length - 1) { 
+            sIdx++; cIdx=0; wIdx=-1; 
+            displayState=tractate[pIdx][mIdx].sentences[sIdx].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE"; 
+        } else { 
+            if (mIdx < tractate[pIdx].length-1) resetToPosition(pIdx, mIdx+1); 
+            else if (pIdx < tractate.length-1) resetToPosition(pIdx+1, 0); 
+        }
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (document.getElementById('nav-modal').style.display === "flex") return;
+        if (e.key.toLowerCase() === 'n') openNav();
+        if (e.code === 'Space') {
+            e.preventDefault();
+            const curM = tractate[pIdx][mIdx];
+            const curS = curM.sentences[sIdx];
+            if (displayState === "CHUNKS") { 
+                if(cIdx < curS.chunks.length-1) cIdx++; 
+                else { displayState="SENTENCE_REVIEW"; wIdx=-1; } 
+            }
+            else if (displayState === "FULL_SENTENCE") {
+                if (sIdx === 0 && curM.sentences.length > 1) { displayState = "SENTENCE_REVIEW"; wIdx = -1; }
+                else advance();
+            }
+            else if (displayState === "SENTENCE_REVIEW") { 
+                if(wIdx < curS.words.length-1) wIdx++; 
+                else (sIdx===0 ? advance() : (displayState="CUMULATIVE_REVIEW", wIdx=-1)); 
+            }
+            else if (displayState === "CUMULATIVE_REVIEW") { 
+                const total = curM.sentences.slice(0, sIdx+1).reduce((a,b)=>a+b.words.length,0); 
+                if(wIdx < total-1) wIdx++; else advance(); 
+            }
+            updateDisplay();
+        }
+    });
+
+    document.getElementById('masechet-search').addEventListener('input', (e)=>renderMasechetList(e.target.value.toLowerCase()));
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'he' : 'en'; updateDisplay(); }
+
+    // Start with the navigator open
+    openNav();
     </script>
 </body>
 </html>
