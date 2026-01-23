@@ -116,41 +116,50 @@
     }
 
     async function selectMasechet(m) {
-        document.getElementById('debug-list').innerHTML = "";
-        log(`Loading Masechet: ${m.en}...`);
+    const debugList = document.getElementById('debug-list');
+    debugList.innerHTML = "";
+    log(`Loading Masechet: ${m.en}...`);
 
-        try {
-            // UPDATED PATHS TO INCLUDE mishnah-app FOLDER
-            const bPath = `mishnah-app/Bartenura/Bartenura_${m.file}.txt`;
-            const mPath = `mishnah-app/Clean_Mishnah/${m.file}.txt`;
+    try {
+        // This detects the "mishnah_memorizer" part of your URL automatically
+        const repoPath = window.location.pathname.includes('mishnah_memorizer') 
+                         ? '/mishnah_memorizer/' 
+                         : './';
 
-            const bResp = await fetch(bPath);
-            if (!bResp.ok) throw new Error(`FAILED to find Bartenura at: ${bPath}`);
-            bartenuraData = await bResp.text();
-            log(`Loaded Bartenura text.`);
+        // Constructing the final paths
+        const bPath = `${repoPath}mishnah-app/bartenura/bartenura_${m.file}.txt`.toLowerCase();
+        const mPath = `${repoPath}mishnah-app/clean_mishnah/${m.file}.txt`.toLowerCase();
 
-            const mResp = await fetch(mPath);
-            if (!mResp.ok) throw new Error(`FAILED to find Mishnah at: ${mPath}`);
-            const mRaw = await mResp.text();
-            parseTractate(mRaw);
-            
-            log(`Loaded Mishnah text. Select a Perek.`);
-            pIdx = 0; mIdx = 0; sIdx = 0; cIdx = 0; wIdx = -1;
-            document.getElementById('step-masechet').classList.add('hidden');
-            document.getElementById('step-perek').classList.remove('hidden');
-            const g = document.getElementById('perek-grid'); g.innerHTML = "";
-            tractate.forEach((_, i) => { 
-                const btn = document.createElement('div'); 
-                btn.className='grid-item'; btn.innerText=i+1; 
-                btn.onclick=()=>selectPerek(i); g.appendChild(btn); 
-            });
+        log(`Fetching Bartenura from: ${bPath}`);
+        const bResp = await fetch(bPath);
+        if (!bResp.ok) throw new Error(`Status ${bResp.status}: Check if 'bartenura' folder and 'bartenura_${m.file}.txt' exist in mishnah-app.`);
+        bartenuraData = await bResp.text();
+        log(`Bartenura loaded.`);
 
-        } catch (err) {
-            log(err.message, true);
-            log("Check if folder names 'mishnah-app', 'Bartenura', and 'Clean_Mishnah' match GitHub EXACTLY (Capitalization matters).", true);
-        }
+        log(`Fetching Mishnah from: ${mPath}`);
+        const mResp = await fetch(mPath);
+        if (!mResp.ok) throw new Error(`Status ${mResp.status}: Check if 'clean_mishnah' folder and '${m.file}.txt' exist in mishnah-app.`);
+        const mRaw = await mResp.text();
+        
+        parseTractate(mRaw);
+        log(`Mishnah loaded successfully!`);
+
+        // Navigation logic
+        pIdx = 0; mIdx = 0; sIdx = 0; cIdx = 0; wIdx = -1;
+        document.getElementById('step-masechet').classList.add('hidden');
+        document.getElementById('step-perek').classList.remove('hidden');
+        const g = document.getElementById('perek-grid'); g.innerHTML = "";
+        tractate.forEach((_, i) => { 
+            const btn = document.createElement('div'); 
+            btn.className='grid-item'; btn.innerText=i+1; 
+            btn.onclick=()=>selectPerek(i); g.appendChild(btn); 
+        });
+
+    } catch (err) {
+        log(`ERROR: ${err.message}`, true);
+        log(`Tip: Ensure your folders are 'mishnah-app', 'bartenura', and 'clean_mishnah' (all lowercase).`, true);
     }
-
+}
     function mapBartenuraToMishnah(sentences, pNum, mNum) {
         if (!bartenuraData) return;
         const cSplit = bartenuraData.split(new RegExp(`Chapter\\s+${pNum + 1}`, 'i'));
