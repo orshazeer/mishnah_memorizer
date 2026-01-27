@@ -504,18 +504,45 @@
  function backToPerek() { document.getElementById('step-mishnah').classList.add('hidden'); document.getElementById('step-perek').classList.remove('hidden'); }
  function renderMasechetList(f) { const c = document.getElementById('masechet-list'); c.innerHTML = ""; masechtotData.forEach(m => { if(m.en.toLowerCase().includes(f) || m.he.includes(f)) { const d = document.createElement('div'); d.className='list-item'; d.innerHTML=`<span>${m.he}</span><span>${m.en}</span>`; d.onclick=()=>selectMasechet(m); c.appendChild(d); } }); }
  
- async function selectMasechet(m) { 
- const r = await fetch(`./Clean_Mishnah/${m.file}.txt`); 
- rawTextCache = await r.text(); 
- parseTractate(rawTextCache); 
- const b = await fetch(`./Bartenura/Bartenura_${m.file}.txt`);
- bartenuraData = b.ok ? await b.text() : "";
- currentTractateName = m.en; currentTractateHebrew = m.he; 
- document.getElementById('step-masechet').classList.add('hidden'); 
- document.getElementById('step-perek').classList.remove('hidden'); 
- const g = document.getElementById('perek-grid'); g.innerHTML = ""; 
- tractate.forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>selectPerek(i); g.appendChild(b); }); 
- }
+ // --- REPLACE YOUR EXISTING selectMasechet FUNCTION WITH THIS ---
+async function selectMasechet(m) { 
+    try {
+        const response = await fetch(`./Clean_Mishnah/${m.file}.txt`);
+        if (!response.ok) throw new Error("Mishnah file not found");
+        
+        rawTextCache = await response.ok ? await response.text() : ""; 
+        parseTractate(rawTextCache); 
+
+        // Try to fetch Bartenura, but don't break if it's missing
+        try {
+            const b = await fetch(`./Bartenura/Bartenura_${m.file}.txt`);
+            bartenuraData = b.ok ? await b.text() : "";
+        } catch (e) {
+            bartenuraData = "";
+        }
+
+        currentTractateName = m.en; 
+        currentTractateHebrew = m.he; 
+        
+        // UI Transition
+        document.getElementById('step-masechet').classList.add('hidden'); 
+        document.getElementById('step-perek').classList.remove('hidden'); 
+        
+        const g = document.getElementById('perek-grid'); 
+        g.innerHTML = ""; 
+        
+        tractate.forEach((_, i) => { 
+            const b = document.createElement('div'); 
+            b.className = 'grid-item'; 
+            b.innerText = i + 1; 
+            b.onclick = () => selectPerek(i); 
+            g.appendChild(b); 
+        }); 
+    } catch (err) {
+        console.error("Selection error:", err);
+        alert("Could not load Masechet. Please check if the file exists in the Clean_Mishnah folder.");
+    }
+}
 
  function selectPerek(p) { 
     pIdx = p; 
