@@ -1,462 +1,463 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
- <title>Mishnah Fluency Pro</title>
- <style>
- :root {
- --bg: #0f172a;
- --surface: #1e293b;
- --surface-hover: #334155;
- --primary: #38bdf8;
- --accent: #fbbf24;
- --error: #f43f5e;
- --success: #10b981;
- --text: #f1f5f9;
- --text-dim: #94a3b8;
- --modal-bg: rgba(15, 23, 42, 0.95);
- --highlight-yellow: rgba(254, 240, 138, 0.6); 
- }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mishnah Fluency Pro</title>
+    <style>
+    :root {
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --surface-hover: #334155;
+        --primary: #38bdf8;
+        --accent: #fbbf24;
+        --error: #f43f5e;
+        --success: #10b981;
+        --text: #f1f5f9;
+        --text-dim: #94a3b8;
+        --modal-bg: rgba(15, 23, 42, 0.95);
+        --highlight-yellow: rgba(254, 240, 138, 0.6); 
+    }
 
- body {
- background-color: var(--bg);
- color: var(--text);
- font-family: 'Inter', 'SBL Hebrew', system-ui, sans-serif;
- display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden;
- touch-action: manipulation;
- }
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Inter', 'SBL Hebrew', system-ui, sans-serif;
+        display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden;
+        touch-action: manipulation;
+    }
 
- #top-bar {
- width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
- box-sizing: border-box; z-index: 10; background: var(--surface); flex-shrink: 0;
- }
+    #top-bar {
+        width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+        box-sizing: border-box; z-index: 10; background: var(--surface); flex-shrink: 0;
+    }
 
- .btn-group { display: flex; gap: 8px; align-items: center; }
- .btn {
- background: var(--bg); border: 1px solid var(--surface-hover); color: var(--text);
- padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600;
- transition: 0.2s;
- }
- .btn:hover { background: var(--surface-hover); border-color: var(--primary); }
- .btn.active-mode { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
+    .btn-group { display: flex; gap: 8px; align-items: center; }
+    .btn {
+        background: var(--bg); border: 1px solid var(--surface-hover); color: var(--text);
+        padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600;
+        transition: 0.2s;
+    }
+    .btn:hover { background: var(--surface-hover); border-color: var(--primary); }
+    .btn.active-mode { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
 
- #main-scroll-container {
- flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center;
- padding: 10px 15px; scroll-behavior: smooth; width: 100%; box-sizing: border-box;
- }
+    #main-scroll-container {
+        flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center;
+        padding: 10px 15px; scroll-behavior: smooth; width: 100%; box-sizing: border-box;
+    }
 
- #status-container { text-align: center; margin-bottom: 15px; width: 100%; flex-shrink: 0; }
- #status { color: var(--primary); font-size: 14px; font-weight: 700; cursor: pointer; }
- #instructions { color: var(--text); font-size: 28px; font-weight: 700; margin-bottom: 2px; }
- #sub-instructions { color: var(--accent); font-size: 14px; font-weight: 500; height: 20px; }
+    #status-container { text-align: center; margin-bottom: 15px; width: 100%; flex-shrink: 0; }
+    #status { color: var(--primary); font-size: 14px; font-weight: 700; cursor: pointer; }
+    #instructions { color: var(--text); font-size: 28px; font-weight: 700; margin-bottom: 2px; }
+    #sub-instructions { color: var(--accent); font-size: 14px; font-weight: 500; height: 20px; }
 
- #display-area {
- width: 100%; min-height: 120px; display: flex; flex-wrap: wrap;
- justify-content: center; align-items: center; text-align: center;
- pointer-events: none; margin-bottom: 40px;
- }
+    #display-area {
+        width: 100%; min-height: 120px; display: flex; flex-wrap: wrap;
+        justify-content: center; align-items: center; text-align: center;
+        pointer-events: none; margin-bottom: 40px;
+    }
 
- .chunk-mode { font-size: 48px; font-weight: 700; line-height: 1.2; }
- .full-mode { font-size: 32px; font-weight: 500; gap: 10px; line-height: 1.4; }
- .word { padding: 2px 4px; border-radius: 6px; }
- .wrong-word { background: rgba(244, 63, 94, 0.2); color: var(--error); text-decoration: line-through; }
- .hint-word { color: var(--accent); font-style: italic; opacity: 0.8; font-weight: bold; }
+    .chunk-mode { font-size: 48px; font-weight: 700; line-height: 1.2; }
+    .full-mode { font-size: 32px; font-weight: 500; gap: 10px; line-height: 1.4; }
+    .word { padding: 2px 4px; border-radius: 6px; }
+    .wrong-word { background: rgba(244, 63, 94, 0.2); color: var(--error); text-decoration: line-through; }
+    .hint-word { color: var(--accent); font-style: italic; opacity: 0.8; font-weight: bold; }
 
- /* FIRST WORD REVIEW STYLES */
- .fw-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
- .fw-item { font-size: 28px; font-weight: 600; color: var(--text); animation: fadeIn 0.15s ease; width: 100%; text-align: center; }
- .fw-separator { width: 90%; text-align: center; color: var(--text-dim); margin: 20px 0; font-size: 14px; border-bottom: 1px solid var(--surface-hover); line-height: 0.1em; }
- .fw-separator span { background: var(--bg); padding: 0 10px; }
- @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .fw-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
+    .fw-item { font-size: 28px; font-weight: 600; color: var(--text); animation: fadeIn 0.15s ease; width: 100%; text-align: center; }
+    .fw-separator { width: 90%; text-align: center; color: var(--text-dim); margin: 20px 0; font-size: 14px; border-bottom: 1px solid var(--surface-hover); line-height: 0.1em; }
+    .fw-separator span { background: var(--bg); padding: 0 10px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
- #progress-pips { margin-top: 10px; display: flex; gap: 6px; justify-content: center; }
- .pip { width: 20px; height: 4px; background: var(--surface-hover); border-radius: 10px; transition: 0.4s; }
- .pip.active { background: var(--primary); width: 35px; }
- .pip.complete { background: var(--success); }
+    #progress-pips { margin-top: 10px; display: flex; gap: 6px; justify-content: center; }
+    .pip { width: 20px; height: 4px; background: var(--surface-hover); border-radius: 10px; transition: 0.4s; }
+    .pip.active { background: var(--primary); width: 35px; }
+    .pip.complete { background: var(--success); }
 
- #bart-container { width: 100%; height: 250px; flex-shrink: 0; background: #0a0f1e; border-top: 3px solid var(--primary); display: none; overflow-y: auto; z-index: 5; }
- #bart-content { font-size: 1.15rem; line-height: 1.7; color: #ffffff; width: 100%; text-align: right; padding: 15px 25px; box-sizing: border-box; }
- .bart-segment { display: inline; cursor: pointer; }
- .explanation { padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s; }
- .active-highlight .explanation { background-color: var(--highlight-yellow); color: #000000; }
+    #bart-container { width: 100%; height: 250px; flex-shrink: 0; background: #0a0f1e; border-top: 3px solid var(--primary); display: none; overflow-y: auto; z-index: 5; }
+    #bart-content { font-size: 1.15rem; line-height: 1.7; color: #ffffff; width: 100%; text-align: right; padding: 15px 25px; box-sizing: border-box; }
+    .bart-segment { display: inline; cursor: pointer; }
+    .explanation { padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s; }
+    .active-highlight .explanation { background-color: var(--highlight-yellow); color: #000000; }
 
- #mobile-back { position: fixed; bottom: 270px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--surface); border: 2px solid var(--primary); color: var(--primary); display: none; align-items: center; justify-content: center; font-size: 22px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
- 
- #nav-modal { display: none; position: fixed; inset: 0; background: var(--modal-bg); backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center; }
- .nav-card { background: var(--surface); width: 600px; max-width: 95%; height: 500px; border-radius: 20px; border: 1px solid var(--surface-hover); display: flex; flex-direction: column; overflow: hidden; }
- .nav-header { padding: 15px; border-bottom: 1px solid var(--surface-hover); display: flex; justify-content: space-between; }
- .nav-body { flex: 1; padding: 15px; overflow-y: auto; }
- .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; }
- .grid-item { background: var(--bg); border: 1px solid var(--surface-hover); border-radius: 8px; height: 42px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
- .list-item { padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; display: flex; justify-content: space-between; margin-bottom: 6px; }
- #masechet-search { background: transparent; border: none; border-bottom: 2px solid var(--surface-hover); color: var(--text); font-size: 18px; padding: 8px 0; width: 100%; margin-bottom: 15px; outline: none; }
- .hidden { display: none !important; }
+    #mobile-back { position: fixed; bottom: 270px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--surface); border: 2px solid var(--primary); color: var(--primary); display: none; align-items: center; justify-content: center; font-size: 22px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    
+    #nav-modal { display: none; position: fixed; inset: 0; background: var(--modal-bg); backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center; }
+    .nav-card { background: var(--surface); width: 600px; max-width: 95%; height: 500px; border-radius: 20px; border: 1px solid var(--surface-hover); display: flex; flex-direction: column; overflow: hidden; }
+    .nav-header { padding: 15px; border-bottom: 1px solid var(--surface-hover); display: flex; justify-content: space-between; }
+    .nav-body { flex: 1; padding: 15px; overflow-y: auto; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; }
+    .grid-item { background: var(--bg); border: 1px solid var(--surface-hover); border-radius: 8px; height: 42px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+    .list-item { padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; display: flex; justify-content: space-between; margin-bottom: 6px; }
+    #masechet-search { background: transparent; border: none; border-bottom: 2px solid var(--surface-hover); color: var(--text); font-size: 18px; padding: 8px 0; width: 100%; margin-bottom: 15px; outline: none; }
+    .hidden { display: none !important; }
 
- @media (max-width: 600px) {
-    #instructions { font-size: 24px; }
-    .chunk-mode { font-size: 38px; }
-    .full-mode { font-size: 26px; }
-    .fw-item { font-size: 24px; }
- }
- </style>
+    @media (max-width: 600px) {
+        #instructions { font-size: 24px; }
+        .chunk-mode { font-size: 38px; }
+        .full-mode { font-size: 26px; }
+        .fw-item { font-size: 24px; }
+    }
+    </style>
 </head>
 <body onload="autoDetectPlatform()" onclick="handleGlobalClick(event)">
 
- <div id="top-bar">
- <div class="btn-group">
- <button class="btn" onclick="openNav(); event.stopPropagation();">📚 Navigator</button>
- <button class="btn" onclick="handleReset(event)">🔄 Reset</button>
- <button id="loop-btn" class="btn" onclick="toggleLoopMode(event)">∞ Review</button>
- </div>
- <div class="btn-group">
- <button id="fw-btn" class="btn" onclick="toggleFirstWordMode(event)">1st Words</button>
- <label style="font-size: 11px; color: var(--text-dim); cursor: pointer;"><input type="checkbox" id="hide-refs" checked onchange="reloadText()"> Hide Refs</label>
- <button class="btn" onclick="toggleLanguage(); event.stopPropagation();">🌐 EN/HE</button>
- </div>
- </div>
-
- <div id="main-scroll-container">
-    <div id="status-container">
-        <div id="status" onclick="openNav()">Select Mishnah</div>
-        <div id="instructions">Mishnah Fluency</div>
-        <div id="sub-instructions">Loading...</div>
-        <div id="progress-pips"></div>
+    <div id="top-bar">
+        <div class="btn-group">
+            <button class="btn" onclick="openNav(); event.stopPropagation();">📚 Navigator</button>
+            <button class="btn" onclick="handleReset(event)">🔄 Reset</button>
+            <button id="loop-btn" class="btn" onclick="toggleLoopMode(event)">∞ Review</button>
+        </div>
+        <div class="btn-group">
+            <button id="fw-btn" class="btn" onclick="toggleFirstWordMode(event)">1st Words</button>
+            <label style="font-size: 11px; color: var(--text-dim); cursor: pointer;"><input type="checkbox" id="hide-refs" checked onchange="reloadText()"> Hide Refs</label>
+            <button class="btn" onclick="toggleLanguage(); event.stopPropagation();">🌐 EN/HE</button>
+        </div>
     </div>
-    <div id="display-area"></div>
- </div>
 
- <div id="bart-container"><div id="bart-content"></div></div>
- <div id="mobile-back" onclick="triggerCorrection(event)">↩</div>
+    <div id="main-scroll-container">
+        <div id="status-container">
+            <div id="status" onclick="openNav()">Select Mishnah</div>
+            <div id="instructions">Mishnah Fluency</div>
+            <div id="sub-instructions">Loading...</div>
+            <div id="progress-pips"></div>
+        </div>
+        <div id="display-area"></div>
+    </div>
 
- <div id="nav-modal" onclick="if(event.target===this) closeNav()">
- <div class="nav-card" onclick="event.stopPropagation()">
- <div class="nav-header"><span id="nav-step-title">Select Masechet</span><button class="btn" onclick="closeNav()">✕</button></div>
- <div class="nav-body">
- <div id="step-masechet"><input type="text" id="masechet-search" placeholder="Search..."><div id="masechet-list"></div></div>
- <div id="step-perek" class="hidden"><button class="btn" onclick="backToMasechet()">← Back</button><div id="perek-grid" class="grid-container" style="margin-top:15px;"></div></div>
- <div id="step-mishnah" class="hidden"><button class="btn" onclick="backToPerek()">← Back</button><div id="mishnah-grid" class="grid-container" style="margin-top:15px;"></div></div>
- </div>
- </div>
- </div>
+    <div id="bart-container"><div id="bart-content"></div></div>
+    <div id="mobile-back" onclick="triggerCorrection(event)">↩</div>
 
- <script>
- function getHebrewLetter(num) {
-    const letters = ["א","ב","ג","ד","ה","ו","ז","ח","ט","י","יא","יב","יג","יד","טו","טז","יז","יח","יט","כ"];
-    return letters[num] || (num + 1);
- }
+    <div id="nav-modal" onclick="if(event.target===this) closeNav()">
+        <div class="nav-card" onclick="event.stopPropagation()">
+            <div class="nav-header"><span id="nav-step-title">Select Masechet</span><button class="btn" onclick="closeNav()">✕</button></div>
+            <div class="nav-body">
+                <div id="step-masechet"><input type="text" id="masechet-search" placeholder="Search..."><div id="masechet-list"></div></div>
+                <div id="step-perek" class="hidden"><button class="btn" onclick="backToMasechet()">← Back</button><div id="perek-grid" class="grid-container" style="margin-top:15px;"></div></div>
+                <div id="step-mishnah" class="hidden"><button class="btn" onclick="backToPerek()">← Back</button><div id="mishnah-grid" class="grid-container" style="margin-top:15px;"></div></div>
+            </div>
+        </div>
+    </div>
 
- let tractate = [], bartenuraData = "", rawTextCache = "", currentTractateName = "", currentTractateHebrew = "";
- let pIdx = 0, mIdx = 0, sIdx = 0, cIdx = 0, wIdx = -1, isMobile = false;
- let displayState = "CHUNKS", currentLang = 'en';
- let correctionTarget = -1, correctionSentenceIdx = -1, returnState = "";
- let showHint = false, isLoopMode = false, isFirstWordMode = false;
- let fwHistory = [];
-
- const content = {
- en: { steps: { CHUNKS: "Learn Chunks", FULL_SENTENCE: "Read Full", SENTENCE_REVIEW: "Recite", CUMULATIVE_REVIEW: "Mastery", CORRECTING: "Correction", FW: "Mishnah Heads" }, subs: { CHUNKS: "Tap/Space to advance", FULL_SENTENCE: "Read full sentence", SENTENCE_REVIEW: "Say next word", CUMULATIVE_REVIEW: "Recite from start", CORRECTING: "Repeat highlighted word", FW: "Space for next Mishnah" } },
- he: { steps: { CHUNKS: "לימוד מקטעים", FULL_SENTENCE: "קריאה מלאה", SENTENCE_REVIEW: "שינון", CUMULATIVE_REVIEW: "חזרה", CORRECTING: "תיקון", FW: "ראשי משניות" }, subs: { CHUNKS: "גע/רווח להתקדמות", FULL_SENTENCE: "קרא משפט מלא", SENTENCE_REVIEW: "אמור מילה הבאה", CUMULATIVE_REVIEW: "חזור מההתחלה", CORRECTING: "חזור על המילה המסומנת", FW: "רווח למשנה הבאה" } }
- };
-
- function autoDetectPlatform() {
-    isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
-    if (isMobile) document.getElementById('mobile-back').style.display = 'flex';
-    openNav();
- }
-
- const masechtotData = [
- { en: "Berakhot", he: "ברכות", file: "Berakhot" }, { en: "Peah", he: "פאה", file: "Peah" }, { en: "Demai", he: "דמאי", file: "Demai" }, { en: "Kilayim", he: "כלאיים", file: "Kilayim" }, { en: "Sheviit", he: "שביעית", file: "Sheviit" }, { en: "Terumot", he: "תרומות", file: "Terumot" }, { en: "Maaserot", he: "מעשרות", file: "Maaserot" }, { en: "Maaser Sheni", he: "מעשר שני", file: "Maaser_Sheni" }, { en: "Challah", he: "חלה", file: "Challah" }, { en: "Orlah", he: "ערלה", file: "Orlah" }, { en: "Bikkurim", he: "ביכורים", file: "Bikkurim" }, { en: "Shabbat", he: "שבת", file: "Shabbat" }, { en: "Eruvin", he: "עירובין", file: "Eruvin" }, { en: "Pesachim", he: "פסחים", file: "Pesachim" }, { en: "Sheqalim", he: "שקלים", file: "Sheqalim" }, { en: "Yoma", he: "יומא", file: "Yoma" }, { en: "Sukkah", he: "סוכה", file: "Sukkah" }, { en: "Beitzah", he: "ביצה", file: "Beitzah" }, { en: "Rosh Hashanah", he: "ראש השנה", file: "Rosh_Hashanah" }, { en: "Taanit", he: "תענית", file: "Taanit" }, { en: "Megillah", he: "מגילה", file: "Megillah" }, { en: "Moed Katan", he: "מועד קטן", file: "Moed_Katan" }, { en: "Chagigah", he: "חגיגה", file: "Chagigah" }
- ];
-
- function handleGlobalClick(e) {
-    if (document.getElementById('nav-modal').style.display === "flex") return;
-    if (e.target.closest('.btn') || e.target.closest('#mobile-back') || e.target.closest('input')) return;
-    handleAdvance();
- }
-
- function handleAdvance() {
-    showHint = false;
-    if (!tractate.length) return;
-
-    if (isFirstWordMode) {
-        advanceFirstWordMode();
-        return;
+    <script>
+    function getHebrewLetter(num) {
+        const letters = ["א","ב","ג","ד","ה","ו","ז","ח","ט","י","יא","יב","יג","יד","טו","טז","יז","יח","יט","כ"];
+        return letters[num] || (num + 1);
     }
 
-    const curM = tractate[pIdx][mIdx];
-    const curS = curM.sentences[sIdx];
+    let tractate = [], bartenuraData = "", rawTextCache = "", currentTractateName = "", currentTractateHebrew = "";
+    let pIdx = 0, mIdx = 0, sIdx = 0, cIdx = 0, wIdx = -1, isMobile = false;
+    let displayState = "CHUNKS", currentLang = 'en';
+    let correctionTarget = -1, correctionSentenceIdx = -1, returnState = "";
+    let showHint = false, isLoopMode = false, isFirstWordMode = false;
+    let fwHistory = [];
 
-    if (displayState === "CHUNKS") {
-        if (cIdx < curS.chunks.length - 1) cIdx++;
-        else { displayState = "SENTENCE_REVIEW"; wIdx = -1; }
-    } else if (displayState === "FULL_SENTENCE") {
-        displayState = "SENTENCE_REVIEW"; wIdx = -1;
-    } else if (displayState === "SENTENCE_REVIEW") {
-        if (wIdx < curS.words.length - 1) wIdx++;
-        else {
-            if (isLoopMode) advanceMishnahPosition();
-            else sIdx === 0 ? advanceMishnahPosition() : (displayState = "CUMULATIVE_REVIEW", wIdx = -1);
-        }
-    } else if (displayState === "CUMULATIVE_REVIEW") {
-        const total = curM.sentences.slice(0, sIdx + 1).reduce((a,b)=>a+b.words.length, 0);
-        if (wIdx < total - 1) wIdx++;
-        else isLoopMode ? (wIdx = -1) : advanceMishnahPosition();
-    } else if (displayState === "CORRECTING") {
-        if (wIdx < correctionTarget) wIdx++; 
-        else { displayState = returnState; wIdx = -1; }
+    const content = {
+        en: { steps: { CHUNKS: "Learn Chunks", FULL_SENTENCE: "Read Full", SENTENCE_REVIEW: "Recite", CUMULATIVE_REVIEW: "Mastery", CORRECTING: "Correction", FW: "Mishnah Heads" }, subs: { CHUNKS: "Tap/Space to advance", FULL_SENTENCE: "Read full sentence", SENTENCE_REVIEW: "Say next word", CUMULATIVE_REVIEW: "Recite from start", CORRECTING: "Repeat highlighted word", FW: "Space for next Mishnah" } },
+        he: { steps: { CHUNKS: "לימוד מקטעים", FULL_SENTENCE: "קריאה מלאה", SENTENCE_REVIEW: "שינון", CUMULATIVE_REVIEW: "חזרה", CORRECTING: "תיקון", FW: "ראשי משניות" }, subs: { CHUNKS: "גע/רווח להתקדמות", FULL_SENTENCE: "קרא משפט מלא", SENTENCE_REVIEW: "אמור מילה הבאה", CUMULATIVE_REVIEW: "חזור מההתחלה", CORRECTING: "חזור על המילה המסומנת", FW: "רווח למשנה הבאה" } }
+    };
+
+    const masechtotData = [
+        // Zeraim
+        { en: "Berakhot", he: "ברכות", file: "Berakhot" }, { en: "Peah", he: "פאה", file: "Peah" }, { en: "Demai", he: "דמאי", file: "Demai" }, { en: "Kilayim", he: "כלאיים", file: "Kilayim" }, { en: "Sheviit", he: "שביעית", file: "Sheviit" }, { en: "Terumot", he: "תרומות", file: "Terumot" }, { en: "Maaserot", he: "מעשרות", file: "Maaserot" }, { en: "Maaser Sheni", he: "מעשר שני", file: "Maaser_Sheni" }, { en: "Challah", he: "חלה", file: "Challah" }, { en: "Orlah", he: "ערלה", file: "Orlah" }, { en: "Bikkurim", he: "ביכורים", file: "Bikkurim" },
+        // Moed
+        { en: "Shabbat", he: "שבת", file: "Shabbat" }, { en: "Eruvin", he: "עירובין", file: "Eruvin" }, { en: "Pesachim", he: "פסחים", file: "Pesachim" }, { en: "Sheqalim", he: "שקלים", file: "Sheqalim" }, { en: "Yoma", he: "יומא", file: "Yoma" }, { en: "Sukkah", he: "סוכה", file: "Sukkah" }, { en: "Beitzah", he: "ביצה", file: "Beitzah" }, { en: "Rosh Hashanah", he: "ראש השנה", file: "Rosh_Hashanah" }, { en: "Taanit", he: "תענית", file: "Taanit" }, { en: "Megillah", he: "מגילה", file: "Megillah" }, { en: "Moed Katan", he: "מועד קטן", file: "Moed_Katan" }, { en: "Chagigah", he: "חגיגה", file: "Chagigah" },
+        // Nashim
+        { en: "Yevamot", he: "יבמות", file: "Yevamot" }, { en: "Ketubot", he: "כתובות", file: "Ketubot" }, { en: "Nedarim", he: "נדרים", file: "Nedarim" }, { en: "Nazir", he: "נזיר", file: "Nazir" }, { en: "Sotah", he: "סוטה", file: "Sotah" }, { en: "Gittin", he: "גיטין", file: "Gittin" }, { en: "Kiddushin", he: "קידושין", file: "Kiddushin" },
+        // Nezikin
+        { en: "Bava Kamma", he: "בבא קמא", file: "Bava_Kamma" }, { en: "Bava Metzia", he: "בבא מציעא", file: "Bava_Metzia" }, { en: "Bava Batra", he: "בבא בתרא", file: "Bava_Batra" }, { en: "Sanhedrin", he: "סנהדרין", file: "Sanhedrin" }, { en: "Makkot", he: "מכות", file: "Makkot" }, { en: "Shevuot", he: "שבועות", file: "Shevuot" }, { en: "Eduyot", he: "עדיות", file: "Eduyot" }, { en: "Avodah Zarah", he: "עבודה זרה", file: "Avodah_Zarah" }, { en: "Avot", he: "אבות", file: "Avot" }, { en: "Horayot", he: "הוריות", file: "Horayot" },
+        // Kodashim
+        { en: "Zevachim", he: "זבחים", file: "Zevachim" }, { en: "Menachot", he: "מנחות", file: "Menachot" }, { en: "Chullin", he: "חולין", file: "Chullin" }, { en: "Bekhorot", he: "בכורות", file: "Bekhorot" }, { en: "Arakhin", he: "ערכין", file: "Arakhin" }, { en: "Temurah", he: "תמורה", file: "Temurah" }, { en: "Keritot", he: "כריתות", file: "Keritot" }, { en: "Meilah", he: "מעילה", file: "Meilah" }, { en: "Tamid", he: "תמיד", file: "Tamid" }, { en: "Middot", he: "מידות", file: "Middot" }, { en: "Qinnim", he: "קנים", file: "Qinnim" },
+        // Tahorot
+        { en: "Kelim", he: "כלים", file: "Kelim" }, { en: "Oholot", he: "אהלות", file: "Oholot" }, { en: "Negaim", he: "נגעים", file: "Negaim" }, { en: "Parah", he: "פרה", file: "Parah" }, { en: "Tohorot", he: "טהרות", file: "Tohorot" }, { en: "Mikvaot", he: "מקואות", file: "Mikvaot" }, { en: "Niddah", he: "נדה", file: "Niddah" }, { en: "Makhshirin", he: "מכשירין", file: "Makhshirin" }, { en: "Zavim", he: "זבים", file: "Zavim" }, { en: "Tevul Yom", he: "טבול יום", file: "Tevul_Yom" }, { en: "Yadayim", he: "ידיים", file: "Yadayim" }, { en: "Oktzin", he: "עוקצין", file: "Oktzin" }
+    ];
+
+    function autoDetectPlatform() {
+        isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
+        if (isMobile) document.getElementById('mobile-back').style.display = 'flex';
+        openNav();
     }
-    updateDisplay();
- }
 
- function advanceFirstWordMode() {
-    if (!tractate[pIdx] || !tractate[pIdx][mIdx]) return;
-    
-    // Check if we hit end of Perek
-    if (mIdx >= tractate[pIdx].length) {
-        if (pIdx < tractate.length - 1) {
-            pIdx++; mIdx = 0;
-            fwHistory.push({ type: 'sep', label: `------ פרק ${getHebrewLetter(pIdx)} ---------` });
-        } else {
-            fwHistory.push({ type: 'sep', label: 'סוף המסכת' });
-            updateDisplay();
+    function handleGlobalClick(e) {
+        if (document.getElementById('nav-modal').style.display === "flex") return;
+        if (e.target.closest('.btn') || e.target.closest('#mobile-back') || e.target.closest('input')) return;
+        handleAdvance();
+    }
+
+    function handleAdvance() {
+        showHint = false;
+        if (!tractate.length) return;
+
+        if (isFirstWordMode) {
+            advanceFirstWordMode();
             return;
         }
-    }
 
-    const word = tractate[pIdx][mIdx].sentences[0].words[0];
-    fwHistory.push({ type: 'word', text: word });
-    mIdx++; 
-    updateDisplay();
- }
-
- function updateDisplay(highlightError = false) {
-    if (!tractate.length) return;
-    const area = document.getElementById('display-area');
-    area.innerHTML = "";
-    const scrollContainer = document.getElementById('main-scroll-container');
-
-    if (isFirstWordMode) {
-        document.getElementById('instructions').innerText = content[currentLang].steps.FW;
-        document.getElementById('sub-instructions').innerText = content[currentLang].subs.FW;
-        document.getElementById('status').innerText = `${currentLang === 'en' ? currentTractateName : currentTractateHebrew} ${getHebrewLetter(pIdx)}`;
-        document.getElementById('progress-pips').innerHTML = "";
-
-        const container = document.createElement('div');
-        container.className = 'fw-container';
-        fwHistory.forEach(item => {
-            const div = document.createElement('div');
-            if (item.type === 'word') { div.className = 'fw-item'; div.innerText = item.text; }
-            else { div.className = 'fw-separator'; div.innerHTML = `<span>${item.label}</span>`; }
-            container.appendChild(div);
-        });
-
-        if (showHint && tractate[pIdx] && tractate[pIdx][mIdx]) {
-            const nextWord = tractate[pIdx][mIdx].sentences[0].words[0];
-            const hintDiv = document.createElement('div');
-            hintDiv.className = 'fw-item hint-word';
-            hintDiv.innerText = nextWord.charAt(0) + "...";
-            container.appendChild(hintDiv);
-        }
-        area.appendChild(container);
-    } else {
         const curM = tractate[pIdx][mIdx];
         const curS = curM.sentences[sIdx];
-        document.getElementById('instructions').innerText = isLoopMode ? (currentLang === 'en' ? "Entire Mishnah Loop" : "חזרה על המשנה") : content[currentLang].steps[displayState];
-        document.getElementById('sub-instructions').innerText = isLoopMode ? (currentLang === 'en' ? "Continuous Review" : "חזרה רציפה") : content[currentLang].subs[displayState];
-        document.getElementById('status').innerText = `${currentLang === 'en' ? currentTractateName : currentTractateHebrew} ${pIdx+1}:${mIdx+1}`;
-        updatePips(curM.sentences.length);
 
-        if (displayState === "CHUNKS") { area.className = "chunk-mode"; area.innerText = curS.chunks[cIdx]; }
-        else if (displayState === "FULL_SENTENCE") { area.className = "chunk-mode"; area.innerText = curS.words.join(' '); }
-        else {
-            area.className = "full-mode";
-            const allWords = (displayState === "SENTENCE_REVIEW") ? curS.words : [].concat(...curM.sentences.slice(0, sIdx + 1).map(s => s.words));
-            allWords.slice(0, wIdx + 1).forEach((w, i) => {
-                const span = document.createElement('span');
-                span.className = "word" + (highlightError && i === wIdx ? " wrong-word" : "");
-                span.innerText = w; area.appendChild(span);
+        if (displayState === "CHUNKS") {
+            if (cIdx < curS.chunks.length - 1) cIdx++;
+            else { displayState = "SENTENCE_REVIEW"; wIdx = -1; }
+        } else if (displayState === "FULL_SENTENCE") {
+            displayState = "SENTENCE_REVIEW"; wIdx = -1;
+        } else if (displayState === "SENTENCE_REVIEW") {
+            if (wIdx < curS.words.length - 1) wIdx++;
+            else {
+                if (isLoopMode) advanceMishnahPosition();
+                else sIdx === 0 ? advanceMishnahPosition() : (displayState = "CUMULATIVE_REVIEW", wIdx = -1);
+            }
+        } else if (displayState === "CUMULATIVE_REVIEW") {
+            const total = curM.sentences.slice(0, sIdx + 1).reduce((a,b)=>a+b.words.length, 0);
+            if (wIdx < total - 1) wIdx++;
+            else isLoopMode ? (wIdx = -1) : advanceMishnahPosition();
+        } else if (displayState === "CORRECTING") {
+            if (wIdx < correctionTarget) wIdx++; 
+            else { displayState = returnState; wIdx = -1; }
+        }
+        updateDisplay();
+    }
+
+    function advanceFirstWordMode() {
+        if (!tractate[pIdx] || !tractate[pIdx][mIdx]) return;
+        if (mIdx >= tractate[pIdx].length) {
+            if (pIdx < tractate.length - 1) {
+                pIdx++; mIdx = 0;
+                fwHistory.push({ type: 'sep', label: `------ פרק ${getHebrewLetter(pIdx)} ---------` });
+            } else {
+                fwHistory.push({ type: 'sep', label: 'סוף המסכת' });
+                updateDisplay();
+                return;
+            }
+        }
+        const word = tractate[pIdx][mIdx].sentences[0].words[0];
+        fwHistory.push({ type: 'word', text: word });
+        mIdx++; 
+        updateDisplay();
+    }
+
+    function updateDisplay(highlightError = false) {
+        if (!tractate.length) return;
+        const area = document.getElementById('display-area');
+        area.innerHTML = "";
+        const scrollContainer = document.getElementById('main-scroll-container');
+
+        if (isFirstWordMode) {
+            document.getElementById('instructions').innerText = content[currentLang].steps.FW;
+            document.getElementById('sub-instructions').innerText = content[currentLang].subs.FW;
+            document.getElementById('status').innerText = `${currentLang === 'en' ? currentTractateName : currentTractateHebrew} ${getHebrewLetter(pIdx)}`;
+            document.getElementById('progress-pips').innerHTML = "";
+
+            const container = document.createElement('div');
+            container.className = 'fw-container';
+            fwHistory.forEach(item => {
+                const div = document.createElement('div');
+                if (item.type === 'word') { div.className = 'fw-item'; div.innerText = item.text; }
+                else { div.className = 'fw-separator'; div.innerHTML = `<span>${item.label}</span>`; }
+                container.appendChild(div);
             });
-            if (showHint && wIdx < allWords.length - 1) {
-                const hintSpan = document.createElement('span');
-                hintSpan.className = "word hint-word";
-                hintSpan.innerText = allWords[wIdx + 1].charAt(0) + "...";
-                area.appendChild(hintSpan);
+
+            if (showHint && tractate[pIdx] && tractate[pIdx][mIdx]) {
+                const nextWord = tractate[pIdx][mIdx].sentences[0].words[0];
+                const hintDiv = document.createElement('div');
+                hintDiv.className = 'fw-item hint-word';
+                hintDiv.innerText = nextWord.charAt(0) + "...";
+                container.appendChild(hintDiv);
             }
-        }
-    }
-    setTimeout(() => { scrollContainer.scrollTop = scrollContainer.scrollHeight; }, 30);
- }
+            area.appendChild(container);
+        } else {
+            const curM = tractate[pIdx][mIdx];
+            const curS = curM.sentences[sIdx];
+            document.getElementById('instructions').innerText = isLoopMode ? (currentLang === 'en' ? "Entire Mishnah Loop" : "חזרה על המשנה") : content[currentLang].steps[displayState];
+            document.getElementById('sub-instructions').innerText = isLoopMode ? (currentLang === 'en' ? "Continuous Review" : "חזרה רציפה") : content[currentLang].subs[displayState];
+            document.getElementById('status').innerText = `${currentLang === 'en' ? currentTractateName : currentTractateHebrew} ${pIdx+1}:${mIdx+1}`;
+            updatePips(curM.sentences.length);
 
- async function selectMasechet(m) { 
-    const r = await fetch(`./Clean_Mishnah/${m.file}.txt`); 
-    rawTextCache = await r.text(); 
-    parseTractate(rawTextCache); 
-    const b = await fetch(`./Bartenura/Bartenura_${m.file}.txt`);
-    bartenuraData = b.ok ? await b.text() : "";
-    currentTractateName = m.en; currentTractateHebrew = m.he; 
-    document.getElementById('step-masechet').classList.add('hidden'); 
-    document.getElementById('step-perek').classList.remove('hidden'); 
-    const g = document.getElementById('perek-grid'); g.innerHTML = ""; 
-    tractate.forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>selectPerek(i); g.appendChild(b); }); 
- }
-
- function selectPerek(p) { pIdx = p; document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.remove('hidden'); const g = document.getElementById('mishnah-grid'); g.innerHTML = ""; tractate[pIdx].forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>{ resetToPosition(pIdx, i); closeNav(); }; g.appendChild(b); }); }
-
- function toggleFirstWordMode(e) {
-    if(e) e.stopPropagation();
-    isFirstWordMode = !isFirstWordMode;
-    
-    // Ensure Bartenura is hidden in FW mode
-    document.getElementById('bart-container').style.display = 'none';
-    
-    isLoopMode = false; 
-    document.getElementById('loop-btn').classList.remove('active-mode');
-    const btn = document.getElementById('fw-btn');
-    
-    if (isFirstWordMode) { 
-        btn.classList.add('active-mode'); 
-        mIdx = 0; // Always start at the first Mishnah of the CURRENT Perek
-        fwHistory = []; 
-        
-        // Auto-load the first word immediately
-        if (tractate[pIdx] && tractate[pIdx][mIdx]) {
-            const word = tractate[pIdx][mIdx].sentences[0].words[0];
-            fwHistory.push({ type: 'word', text: word });
-            mIdx++;
-        }
-        updateDisplay(); 
-    } else { 
-        btn.classList.remove('active-mode'); 
-        resetToPosition(pIdx, 0); 
-    }
- }
-
- function resetToPosition(p, m) { 
-    pIdx = p; mIdx = m; sIdx = 0; cIdx = 0; wIdx = -1; showHint = false;
-    isLoopMode = false; document.getElementById('loop-btn').classList.remove('active-mode');
-    if (tractate[pIdx] && tractate[pIdx][mIdx]) {
-        displayState = tractate[pIdx][mIdx].sentences[0].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
-        loadFullBartenura(p, m);
-    }
-    updateDisplay(); 
- }
-
- function triggerCorrection(e) {
-    if (e) e.stopPropagation();
-    if (isFirstWordMode) { 
-        if (fwHistory.length > 0) fwHistory.pop(); // Remove last word
-        if (mIdx > 0) mIdx--;
-        updateDisplay(); 
-        return; 
-    }
-    if (wIdx < 0 || displayState === "CORRECTING") return;
-    returnState = displayState;
-    const curM = tractate[pIdx][mIdx];
-    if (displayState === "CUMULATIVE_REVIEW") {
-        let count = 0;
-        for (let i = 0; i <= sIdx; i++) {
-            let len = curM.sentences[i].words.length;
-            if (wIdx < count + len) { correctionSentenceIdx = i; correctionTarget = wIdx - count; break; }
-            count += len;
-        }
-    } else { correctionSentenceIdx = sIdx; correctionTarget = wIdx; }
-    updateDisplay(true);
-    setTimeout(() => { displayState = "CORRECTING"; wIdx = -1; updateDisplay(); }, 400);
- }
-
- function parseTractate(text) {
-    const hideRefs = document.getElementById('hide-refs').checked;
-    const refRegex = /\([\u0590-\u05FF\s0-9"']+\)/g;
-    const perekBlocks = text.split(/\n\s*\n/); 
-    tractate = perekBlocks.map(block => {
-        const lines = block.split('\n').map(l => l.trim()).filter(l => l && !(l.includes("משנה") && l.length < 20));
-        return lines.map(mText => {
-            let cleanText = hideRefs ? mText.replace(refRegex, "") : mText;
-            const sentences = cleanText.split(/([.:?])/).reduce((acc, val, i) => {
-                if (i % 2 === 0 && val.trim()) {
-                    const cleanStr = val.trim();
-                    const words = cleanStr.split(/\s+/).filter(w => w.length > 0);
-                    const chunks = cleanStr.split(/([,;])+/).reduce((cAcc, cVal, cI, cArr) => {
-                        if (cI % 2 === 0 && cVal.trim()) cAcc.push(cVal.trim() + (cArr[cI+1] || ""));
-                        return cAcc;
-                    }, []);
-                    acc.push({ words, chunks, hasInternalBreaks: chunks.length > 1 });
+            if (displayState === "CHUNKS") { area.className = "chunk-mode"; area.innerText = curS.chunks[cIdx]; }
+            else if (displayState === "FULL_SENTENCE") { area.className = "chunk-mode"; area.innerText = curS.words.join(' '); }
+            else {
+                area.className = "full-mode";
+                const allWords = (displayState === "SENTENCE_REVIEW") ? curS.words : [].concat(...curM.sentences.slice(0, sIdx + 1).map(s => s.words));
+                allWords.slice(0, wIdx + 1).forEach((w, i) => {
+                    const span = document.createElement('span');
+                    span.className = "word" + (highlightError && i === wIdx ? " wrong-word" : "");
+                    span.innerText = w; area.appendChild(span);
+                });
+                if (showHint && wIdx < allWords.length - 1) {
+                    const hintSpan = document.createElement('span');
+                    hintSpan.className = "word hint-word";
+                    hintSpan.innerText = allWords[wIdx + 1].charAt(0) + "...";
+                    area.appendChild(hintSpan);
                 }
-                return acc;
-            }, []);
-            return { sentences };
-        });
-    }).filter(p => p.length > 0);
- }
-
- function loadFullBartenura(p, m) {
-    const box = document.getElementById('bart-container');
-    const contentArea = document.getElementById('bart-content');
-    if (!bartenuraData || isFirstWordMode) { box.style.display = 'none'; return; }
-    const cSplit = bartenuraData.split(new RegExp(`Chapter\\s+${p + 1}`, 'i'));
-    if (cSplit.length < 2) { box.style.display = 'none'; return; }
-    const mSplit = cSplit[1].split(new RegExp(`Mishnah\\s+${m + 1}`, 'i'));
-    if (mSplit.length < 2) { box.style.display = 'none'; return; }
-    let rawMText = mSplit[1].split(/Mishnah\s+\d+|Chapter\s+\d+/i)[0].trim();
-    if (rawMText) {
-        const parts = rawMText.split(/(?=<b>)/g);
-        contentArea.innerHTML = parts.map(part => {
-            const boldMatch = part.match(/<b>(.*?)<\/b>/);
-            if (boldMatch) {
-                const boldPart = boldMatch[0];
-                const rest = part.replace(boldPart, "");
-                return `<span class="bart-segment">${boldPart}<span class="explanation">${rest}</span></span>`;
             }
-            return `<span class="bart-segment"><span class="explanation">${part}</span></span>`;
-        }).join('');
-        box.style.display = 'block'; box.scrollTop = 0;
-    } else { box.style.display = 'none'; }
- }
-
- function advanceMishnahPosition() {
-    const curM = tractate[pIdx][mIdx];
-    if (sIdx < curM.sentences.length - 1) {
-        sIdx++; cIdx = 0; wIdx = -1;
-        displayState = curM.sentences[sIdx].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
-    } else {
-        if (mIdx < tractate[pIdx].length - 1) resetToPosition(pIdx, mIdx+1);
-        else if (pIdx < tractate.length -1) resetToPosition(pIdx + 1, 0);
+        }
+        setTimeout(() => { scrollContainer.scrollTop = scrollContainer.scrollHeight; }, 30);
     }
- }
 
- function toggleLoopMode(e) {
-    if (e) e.stopPropagation();
-    isLoopMode = !isLoopMode; isFirstWordMode = false; document.getElementById('fw-btn').classList.remove('active-mode');
-    const btn = document.getElementById('loop-btn');
-    if (isLoopMode) { btn.classList.add('active-mode'); sIdx = tractate[pIdx][mIdx].sentences.length - 1; wIdx = -1; displayState = "CUMULATIVE_REVIEW"; updateDisplay(); }
-    else { btn.classList.remove('active-mode'); resetToPosition(pIdx, mIdx); }
- }
-
- function openNav() { document.getElementById('nav-modal').style.display = "flex"; resetNavToMasechet(); }
- function closeNav() { document.getElementById('nav-modal').style.display = "none"; }
- function resetNavToMasechet() { document.getElementById('step-masechet').classList.remove('hidden'); document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.add('hidden'); renderMasechetList(""); }
- function backToMasechet() { resetNavToMasechet(); }
- function backToPerek() { document.getElementById('step-mishnah').classList.add('hidden'); document.getElementById('step-perek').classList.remove('hidden'); }
- function renderMasechetList(f) { const c = document.getElementById('masechet-list'); c.innerHTML = ""; masechtotData.forEach(m => { if(m.en.toLowerCase().includes(f) || m.he.includes(f)) { const d = document.createElement('div'); d.className='list-item'; d.innerHTML=`<span>${m.he}</span><span>${m.en}</span>`; d.onclick=()=>selectMasechet(m); c.appendChild(d); } }); }
- function toggleLanguage() { currentLang = currentLang === 'en' ? 'he' : 'en'; updateDisplay(); }
- function updatePips(total) {
-    const container = document.getElementById('progress-pips'); container.innerHTML = "";
-    for(let i=0; i<total; i++) {
-        const p = document.createElement('div');
-        p.className = "pip " + (i < sIdx ? "complete" : (i === sIdx ? "active" : ""));
-        container.appendChild(p);
+    async function selectMasechet(m) { 
+        const r = await fetch(`./Clean_Mishnah/${m.file}.txt`); 
+        rawTextCache = await r.text(); 
+        parseTractate(rawTextCache); 
+        const b = await fetch(`./Bartenura/Bartenura_${m.file}.txt`);
+        bartenuraData = b.ok ? await b.text() : "";
+        currentTractateName = m.en; currentTractateHebrew = m.he; 
+        document.getElementById('step-masechet').classList.add('hidden'); 
+        document.getElementById('step-perek').classList.remove('hidden'); 
+        const g = document.getElementById('perek-grid'); g.innerHTML = ""; 
+        tractate.forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>selectPerek(i); g.appendChild(b); }); 
     }
- }
- function handleReset(e) { if (e) e.stopPropagation(); resetToPosition(pIdx, mIdx); }
- function reloadText() { if(rawTextCache) { parseTractate(rawTextCache); resetToPosition(pIdx, mIdx); } }
 
- window.addEventListener('keydown', (e) => {
-    if (document.getElementById('nav-modal').style.display === "flex") return;
-    if (e.key.toLowerCase() === 'h') { if (!showHint) { showHint = true; updateDisplay(); } }
-    if (e.code === 'Space') { e.preventDefault(); handleAdvance(); }
-    if (e.code === 'Backspace') { e.preventDefault(); triggerCorrection(); }
- });
- document.getElementById('masechet-search').addEventListener('input', (e) => renderMasechetList(e.target.value.toLowerCase()));
- </script>
+    function selectPerek(p) { pIdx = p; document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.remove('hidden'); const g = document.getElementById('mishnah-grid'); g.innerHTML = ""; tractate[pIdx].forEach((_, i) => { const b = document.createElement('div'); b.className='grid-item'; b.innerText=i+1; b.onclick=()=>{ resetToPosition(pIdx, i); closeNav(); }; g.appendChild(b); }); }
+
+    function toggleFirstWordMode(e) {
+        if(e) e.stopPropagation();
+        isFirstWordMode = !isFirstWordMode;
+        document.getElementById('bart-container').style.display = 'none';
+        isLoopMode = false; 
+        document.getElementById('loop-btn').classList.remove('active-mode');
+        const btn = document.getElementById('fw-btn');
+        if (isFirstWordMode) { 
+            btn.classList.add('active-mode'); 
+            mIdx = 0;
+            fwHistory = []; 
+            if (tractate[pIdx] && tractate[pIdx][mIdx]) {
+                const word = tractate[pIdx][mIdx].sentences[0].words[0];
+                fwHistory.push({ type: 'word', text: word });
+                mIdx++;
+            }
+            updateDisplay(); 
+        } else { 
+            btn.classList.remove('active-mode'); 
+            resetToPosition(pIdx, 0); 
+        }
+    }
+
+    function resetToPosition(p, m) { 
+        pIdx = p; mIdx = m; sIdx = 0; cIdx = 0; wIdx = -1; showHint = false;
+        isLoopMode = false; document.getElementById('loop-btn').classList.remove('active-mode');
+        if (tractate[pIdx] && tractate[pIdx][mIdx]) {
+            displayState = tractate[pIdx][mIdx].sentences[0].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
+            loadFullBartenura(p, m);
+        }
+        updateDisplay(); 
+    }
+
+    function triggerCorrection(e) {
+        if (e) e.stopPropagation();
+        if (isFirstWordMode) { 
+            if (fwHistory.length > 0) fwHistory.pop();
+            if (mIdx > 0) mIdx--;
+            updateDisplay(); 
+            return; 
+        }
+        if (wIdx < 0 || displayState === "CORRECTING") return;
+        returnState = displayState;
+        const curM = tractate[pIdx][mIdx];
+        if (displayState === "CUMULATIVE_REVIEW") {
+            let count = 0;
+            for (let i = 0; i <= sIdx; i++) {
+                let len = curM.sentences[i].words.length;
+                if (wIdx < count + len) { correctionSentenceIdx = i; correctionTarget = wIdx - count; break; }
+                count += len;
+            }
+        } else { correctionSentenceIdx = sIdx; correctionTarget = wIdx; }
+        updateDisplay(true);
+        setTimeout(() => { displayState = "CORRECTING"; wIdx = -1; updateDisplay(); }, 400);
+    }
+
+    function parseTractate(text) {
+        const hideRefs = document.getElementById('hide-refs').checked;
+        const refRegex = /\([\u0590-\u05FF\s0-9"']+\)/g;
+        const perekBlocks = text.split(/\n\s*\n/); 
+        tractate = perekBlocks.map(block => {
+            const lines = block.split('\n').map(l => l.trim()).filter(l => l && !(l.includes("משנה") && l.length < 20));
+            return lines.map(mText => {
+                let cleanText = hideRefs ? mText.replace(refRegex, "") : mText;
+                const sentences = cleanText.split(/([.:?])/).reduce((acc, val, i) => {
+                    if (i % 2 === 0 && val.trim()) {
+                        const cleanStr = val.trim();
+                        const words = cleanStr.split(/\s+/).filter(w => w.length > 0);
+                        const chunks = cleanStr.split(/([,;])+/).reduce((cAcc, cVal, cI, cArr) => {
+                            if (cI % 2 === 0 && cVal.trim()) cAcc.push(cVal.trim() + (cArr[cI+1] || ""));
+                            return cAcc;
+                        }, []);
+                        acc.push({ words, chunks, hasInternalBreaks: chunks.length > 1 });
+                    }
+                    return acc;
+                }, []);
+                return { sentences };
+            });
+        }).filter(p => p.length > 0);
+    }
+
+    function loadFullBartenura(p, m) {
+        const box = document.getElementById('bart-container');
+        const contentArea = document.getElementById('bart-content');
+        if (!bartenuraData || isFirstWordMode) { box.style.display = 'none'; return; }
+        const cSplit = bartenuraData.split(new RegExp(`Chapter\\s+${p + 1}`, 'i'));
+        if (cSplit.length < 2) { box.style.display = 'none'; return; }
+        const mSplit = cSplit[1].split(new RegExp(`Mishnah\\s+${m + 1}`, 'i'));
+        if (mSplit.length < 2) { box.style.display = 'none'; return; }
+        let rawMText = mSplit[1].split(/Mishnah\s+\d+|Chapter\s+\d+/i)[0].trim();
+        if (rawMText) {
+            const parts = rawMText.split(/(?=<b>)/g);
+            contentArea.innerHTML = parts.map(part => {
+                const boldMatch = part.match(/<b>(.*?)<\/b>/);
+                if (boldMatch) {
+                    const boldPart = boldMatch[0];
+                    const rest = part.replace(boldPart, "");
+                    return `<span class="bart-segment">${boldPart}<span class="explanation">${rest}</span></span>`;
+                }
+                return `<span class="bart-segment"><span class="explanation">${part}</span></span>`;
+            }).join('');
+            box.style.display = 'block'; box.scrollTop = 0;
+        } else { box.style.display = 'none'; }
+    }
+
+    function advanceMishnahPosition() {
+        const curM = tractate[pIdx][mIdx];
+        if (sIdx < curM.sentences.length - 1) {
+            sIdx++; cIdx = 0; wIdx = -1;
+            displayState = curM.sentences[sIdx].hasInternalBreaks ? "CHUNKS" : "FULL_SENTENCE";
+        } else {
+            if (mIdx < tractate[pIdx].length - 1) resetToPosition(pIdx, mIdx+1);
+            else if (pIdx < tractate.length -1) resetToPosition(pIdx + 1, 0);
+        }
+    }
+
+    function toggleLoopMode(e) {
+        if (e) e.stopPropagation();
+        isLoopMode = !isLoopMode; isFirstWordMode = false; document.getElementById('fw-btn').classList.remove('active-mode');
+        const btn = document.getElementById('loop-btn');
+        if (isLoopMode) { btn.classList.add('active-mode'); sIdx = tractate[pIdx][mIdx].sentences.length - 1; wIdx = -1; displayState = "CUMULATIVE_REVIEW"; updateDisplay(); }
+        else { btn.classList.remove('active-mode'); resetToPosition(pIdx, mIdx); }
+    }
+
+    function openNav() { document.getElementById('nav-modal').style.display = "flex"; resetNavToMasechet(); }
+    function closeNav() { document.getElementById('nav-modal').style.display = "none"; }
+    function resetNavToMasechet() { document.getElementById('step-masechet').classList.remove('hidden'); document.getElementById('step-perek').classList.add('hidden'); document.getElementById('step-mishnah').classList.add('hidden'); renderMasechetList(""); }
+    function backToMasechet() { resetNavToMasechet(); }
+    function backToPerek() { document.getElementById('step-mishnah').classList.add('hidden'); document.getElementById('step-perek').classList.remove('hidden'); }
+    function renderMasechetList(f) { const c = document.getElementById('masechet-list'); c.innerHTML = ""; masechtotData.forEach(m => { if(m.en.toLowerCase().includes(f) || m.he.includes(f)) { const d = document.createElement('div'); d.className='list-item'; d.innerHTML=`<span>${m.he}</span><span>${m.en}</span>`; d.onclick=()=>selectMasechet(m); c.appendChild(d); } }); }
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'he' : 'en'; updateDisplay(); }
+    function updatePips(total) {
+        const container = document.getElementById('progress-pips'); container.innerHTML = "";
+        for(let i=0; i<total; i++) {
+            const p = document.createElement('div');
+            p.className = "pip " + (i < sIdx ? "complete" : (i === sIdx ? "active" : ""));
+            container.appendChild(p);
+        }
+    }
+    function handleReset(e) { if (e) e.stopPropagation(); resetToPosition(pIdx, mIdx); }
+    function reloadText() { if(rawTextCache) { parseTractate(rawTextCache); resetToPosition(pIdx, mIdx); } }
+
+    window.addEventListener('keydown', (e) => {
+        if (document.getElementById('nav-modal').style.display === "flex") return;
+        if (e.key.toLowerCase() === 'h') { if (!showHint) { showHint = true; updateDisplay(); } }
+        if (e.code === 'Space') { e.preventDefault(); handleAdvance(); }
+        if (e.code === 'Backspace') { e.preventDefault(); triggerCorrection(); }
+    });
+    document.getElementById('masechet-search').addEventListener('input', (e) => renderMasechetList(e.target.value.toLowerCase()));
+    </script>
 </body>
 </html>
